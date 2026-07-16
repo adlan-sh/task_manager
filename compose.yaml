@@ -1,0 +1,64 @@
+name: accounts
+
+services:
+    web:
+        container_name: ${APP_NAME}_web
+        build:
+            context: ./
+            dockerfile: ./docker/web/Dockerfile
+            target: web-dev
+            args:
+                APP_BASE_DIR: ${APP_BASE_DIR:-./app}
+        restart: unless-stopped
+        ports:
+            - ${HTTP_PORT}:8080
+        environment:
+            PHP_FPM_HOST: app
+        volumes:
+            - ${APP_BASE_DIR}/public:/app/public
+        networks:
+            - test
+
+    app:
+        container_name: ${APP_NAME}_app
+        build:
+            context: .
+            dockerfile: ./docker/app/Dockerfile
+            target: app-dev
+            args:
+                APP_BASE_DIR: ${APP_BASE_DIR}
+        volumes:
+            - ${APP_BASE_DIR}:/app
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        env_file:
+            - .env
+        restart: unless-stopped
+        depends_on:
+            - db
+        networks:
+            - test
+
+    db:
+        container_name: ${APP_NAME}_db
+        image: postgres:16-alpine3.18
+        environment:
+            POSTGRES_DB: ${DB_DATABASE}
+            POSTGRES_USER: ${DB_USERNAME}
+            POSTGRES_PASSWORD: ${DB_PASSWORD}
+            PGDATA: /data/postgres
+        volumes:
+            - database:/data/postgres
+            - ./var/pgbackup:/backup
+        ports:
+            - ${DB_PORT}:5432
+        restart: unless-stopped
+        networks:
+            - test
+
+volumes:
+    database:
+
+networks:
+    test:
+        driver: bridge

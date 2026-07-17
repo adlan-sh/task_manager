@@ -6,6 +6,8 @@
 3. Запустить миграции ```php artisan migrate```
 4. Запустить сидер ```php artisan db:seed```
 
+Swagger открывается по URL: ```/swagger```
+
 ### Endpoints:
 
 1. Создание задачи:

@@ -8,7 +8,7 @@ enum TaskPriority: string
 {
     case LOW = 'LOW';
 
-    case MIDDLE = 'MIDDLE';
+    case MEDIUM = 'MEDIUM';
 
     case HIGH = 'HIGH';
 }
